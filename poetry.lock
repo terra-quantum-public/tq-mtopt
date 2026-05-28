@@ -445,7 +445,7 @@ version = "3.15"
 description = "Internationalized Domain Names in Applications (IDNA)"
 optional = false
 python-versions = ">=3.8"
-groups = ["dev", "docs"]
+groups = ["docs"]
 files = [
     {file = "idna-3.15-py3-none-any.whl", hash = "sha256:048adeaf8c2d788c40fee287673ccaa74c24ffd8dcf09ffa555a2fbb59f10ac8"},
     {file = "idna-3.15.tar.gz", hash = "sha256:ca962446ea538f7092a95e057da437618e886f4d349216d2b1e294abfdb65fdc"},
@@ -1736,14 +1736,14 @@ sphinxcontrib-serializinghtml = ">=1.1.9"
 
 [[package]]
 name = "sphinx-autodoc-typehints"
-version = "3.10.2"
+version = "3.10.3"
 description = "Type hints (PEP 484) support for the Sphinx autodoc extension"
 optional = false
 python-versions = ">=3.12"
 groups = ["docs"]
 files = [
-    {file = "sphinx_autodoc_typehints-3.10.2-py3-none-any.whl", hash = "sha256:2d1bcac8f62b8d0d210f6ca44b8e016e314d07cc8c30d0512cf6986a0b042b26"},
-    {file = "sphinx_autodoc_typehints-3.10.2.tar.gz", hash = "sha256:34db651eb14343ba16bd9c03e0f5093971f9bbd3cc6b0a1470adecd578940b9c"},
+    {file = "sphinx_autodoc_typehints-3.10.3-py3-none-any.whl", hash = "sha256:c6f9909dbdf81085f01b8a677f4da9accf97bd403d9bf820718fd5a745da355f"},
+    {file = "sphinx_autodoc_typehints-3.10.3.tar.gz", hash = "sha256:01798d25041a16b95c5e053a45b133228e66ff37dbeef0ae8b3add4937aa41a2"},
 ]
 
 [package.dependencies]
@@ -1980,4 +1980,4 @@ zstd = ["backports-zstd (>=1.0.0) ; python_version < \"3.14\""]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<3.14"
-content-hash = "40e0330854c45cfac5fae4c3997f027f61838c411b403e6f0b9434343dedbd57"
+content-hash = "92ceeb433b55003475a8489e9ace0c917314259746fff43aa8174122c2bbcb9a"
