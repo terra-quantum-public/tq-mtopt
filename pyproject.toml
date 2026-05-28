@@ -10,7 +10,7 @@ license-files = ["LICENSE.md", "NOTICE.md"]
 readme = "README.md"
 requires-python = ">=3.12,<3.14"
 dependencies = [
-    "numpy>=2.3.4,<3.0.0",
+    "numpy>=2.4.6,<3.0.0",
     "scipy>=1.16.3,<2.0.0",
     "networkx>=3.6.1,<4.0",
     "pandas>=2.3.3,<3.0.0",
@@ -23,7 +23,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^9.0.3"
-ruff = "^0.15.12"
+ruff = "^0.15.14"
 pylint = "^4.0.5"
 plotly-stubs = "0.1.3"
 matplotlib-stubs = "0.3.11"
