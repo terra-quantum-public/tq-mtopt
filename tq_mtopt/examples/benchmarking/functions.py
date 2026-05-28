@@ -125,16 +125,15 @@ def multiwell(x, seed: int = 42) -> float:
     """
     Nearest-neighbour multiwell potential (pairwise Lorentzian coupling).
 
-    Motivated by pairwise interaction potentials in quantum chemistry (e.g.
-    Coulomb and van-der-Waals interactions between neighbouring atoms in a
-    1-D chain), where the total energy is a sum of two-body terms that couple
+    Motivated by pairwise interaction potentials in quantum chemistry
+    where the total energy is a sum of two-body terms that couple
     adjacent coordinates.  Each term factorises as a product of two 1-D
-    Lorentzians, giving the function TT rank <= m = D.  Unlike a full D-body
+    Lorentzians, giving the function TT rank <= m+1 = D.  Unlike a full D-body
     product, a pairwise term provides clear signal in every 1-D cross-section
     because only ONE adjacent coordinate needs to be near its well centre for
-    the signal to be detectable.  This makes the function well-suited for
+    the signal to be detectable. This makes the function well-suited for
     tensor cross methods (TRC, MTC, TTOpt) while remaining genuinely
-    challenging for population-based optimisers (D = 10 interacting degrees
+    challenging for population-based optimisers (D = 11 interacting degrees
     of freedom with m = 10 distinct well configurations).
 
     Definition:
@@ -150,6 +149,8 @@ def multiwell(x, seed: int = 42) -> float:
     TT rank: <= m = D
     """
     x = np.asarray(x, dtype=float)
+    if x.ndim != 1:
+        raise ValueError("multiwell expects a 1-D input array")
     D = int(x.size)
     sigma = 2.0
 
