@@ -1,7 +1,7 @@
 """Top-level command line interface to run TRC/MTC/TTOpt/... benchmarks and generate plots.
 
 Example:
-python benchmark.py \
+python benchmark_optimization.py \
 --num_dimensions 7 --num_grid_points 5 --ranks 1 2 3 4 5 \
 --num_sweeps 6 --seed 42 --num_experiments 10 \
 --functions Ackley Alpine1 Brown Exponential Griewank Qing Rastrigin Schaffer \
@@ -95,27 +95,36 @@ def main() -> None:
     # dimension-aware f_opt map (fills Michalewicz for D=5 or D=10)
     f_opt_map = resolve_f_opt_map(F_OPT, args.num_dimensions)
 
-    df_results = compare_all(
-        num_dimensions=args.num_dimensions,
-        num_grid_points=args.num_grid_points,
-        num_experiments=args.num_experiments,
-        ranks=args.ranks,
-        num_sweeps=args.num_sweeps,
-        seed=args.seed,
-        tests=tests,
-        methods=args.methods,
-        f_opt_map=f_opt_map,
-        thresholds=tuple(args.thresholds),
-        grid_type=args.grid_type,
-        qtt_levels=args.qtt_levels,
-        qtt_base=args.qtt_base,
-        qtt_z=args.qtt_z,
-    )
-
     os.makedirs(args.out_dir, exist_ok=True)
 
-    for fn_name, df_fn in df_results.groupby("Function"):
+    # Run one function at a time and checkpoint after each so a crash loses
+    # at most one function's results.
+    all_dfs = []
+    for fn_name, fn_callable, fn_bounds in tests:
         results_path = os.path.join(args.out_dir, f"results_{fn_name}.csv")
+        if os.path.exists(results_path):
+            print(f"Skipping {fn_name} (already saved at {results_path})")
+            import pandas as pd
+            all_dfs.append(pd.read_csv(results_path))
+            continue
+
+        print(f"\n── {fn_name} ─────────────────────────────────────")
+        df_fn = compare_all(
+            num_dimensions=args.num_dimensions,
+            num_grid_points=args.num_grid_points,
+            num_experiments=args.num_experiments,
+            ranks=args.ranks,
+            num_sweeps=args.num_sweeps,
+            seed=args.seed,
+            tests=[(fn_name, fn_callable, fn_bounds)],
+            methods=args.methods,
+            f_opt_map=f_opt_map,
+            thresholds=tuple(args.thresholds),
+            grid_type=args.grid_type,
+            qtt_levels=args.qtt_levels,
+            qtt_base=args.qtt_base,
+            qtt_z=args.qtt_z,
+        )
         df_fn.to_csv(results_path, index=False)
         print(f"Saved results -> {results_path}")
         save_best_errors_csv(
@@ -124,8 +133,11 @@ def main() -> None:
             path=os.path.join(args.out_dir, f"best_errors_{fn_name}.csv"),
             sci_digits=1,
         )
+        all_dfs.append(df_fn)
 
-    print(df_results)
+    import pandas as pd
+    df_results = pd.concat(all_dfs, ignore_index=True)
+
     # Plots use the resolved map
     make_plots(df_results, f_opt_map, out_dir=os.path.join(args.out_dir, "plots"))
 
