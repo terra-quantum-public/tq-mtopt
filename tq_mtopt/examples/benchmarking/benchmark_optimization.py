@@ -105,6 +105,7 @@ def main() -> None:
         if os.path.exists(results_path):
             print(f"Skipping {fn_name} (already saved at {results_path})")
             import pandas as pd
+
             all_dfs.append(pd.read_csv(results_path))
             continue
 
@@ -136,6 +137,7 @@ def main() -> None:
         all_dfs.append(df_fn)
 
     import pandas as pd
+
     df_results = pd.concat(all_dfs, ignore_index=True)
 
     # Plots use the resolved map
