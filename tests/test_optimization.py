@@ -434,8 +434,8 @@ def test_grid_evaluate_vectorized_is_faster_walltime():
     obj_vec = Objective(error_fn_vec)
     obj_pt = Objective(error_fn_pt)
 
-    t_vec = median_time(lambda: grid.evaluate(obj_vec), repeats=30)
-    t_pt = median_time(lambda: grid.evaluate(obj_pt), repeats=30)
+    median_time(lambda: grid.evaluate(obj_vec), repeats=30)
+    median_time(lambda: grid.evaluate(obj_pt), repeats=30)
 
     # Underlying call counts (sanity):
     assert calls_vec["n"] >= 1

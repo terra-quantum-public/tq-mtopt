@@ -291,7 +291,6 @@ def test_decoder_decode_no_bounds_returns_float_indices():
 def test_decoder_decode_bounds_lower_upper():
     # index 0 -> lower bound, index N-1 -> upper bound (endpoint=True)
     L, base = 3, 2
-    N = base**L  # = 8, indices 0..7
     bounds = [(-5.0, 5.0), (0.0, 1.0)]
     dec = QTTDecoder(num_vars=2, levels=L, base=base, bounds=bounds, endpoint=True)
 
