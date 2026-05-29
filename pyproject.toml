@@ -40,3 +40,9 @@ sphinx-autodoc-typehints = ">=2.0"
 
 [tool.poetry]
 packages = [{ include = "tq_mtopt" }]
+
+[tool.ruff]
+exclude = ["*.ipynb"]
+
+[tool.ruff.lint]
+ignore = ["E731"]
