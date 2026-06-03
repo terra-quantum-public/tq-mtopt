@@ -36,7 +36,7 @@ tqdm = "^4.67.1"
 [tool.poetry.group.docs.dependencies]
 sphinx = ">=7.0"
 sphinx-rtd-theme = ">=2.0"
-sphinx-autodoc-typehints = ">=3.10.4"
+sphinx-autodoc-typehints = ">=3.10.5"
 
 [tool.poetry]
 packages = [{ include = "tq_mtopt" }]
