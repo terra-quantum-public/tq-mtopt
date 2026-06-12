@@ -586,4 +586,6 @@ def build_mt_representation(
             cross_inverses.append(np.linalg.pinv(C_sel, rcond=rcond))
 
     skeleton_grids = [skel_pts.copy() for _ in range(d - 1)]
-    return MTRepresentation(skeleton_grids, factor_matrices, cross_inverses, primitive_grids)
+    return MTRepresentation(
+        skeleton_grids, factor_matrices, cross_inverses, primitive_grids
+    )

@@ -127,7 +127,7 @@ def multiwell(x, seed: int = 42) -> float:
 
     Motivated by pairwise interaction potentials in quantum chemistry
     where the total energy is a sum of two-body terms that couple
-    adjacent coordinates.  Each term factorises as a product of two 
+    adjacent coordinates.  Each term factorises as a product of two
     one-dimensional Lorentzians, giving the function TT rank <= m+2 = D+2.
 
     Unlike a full D-body product, a pairwise term provides clear signal in every

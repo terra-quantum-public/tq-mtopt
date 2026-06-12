@@ -185,8 +185,11 @@ def run_representation(
         # Single-pass cost: r*N for boundary sites, r^2*N per interior site.
         d = len(primitives)
         Ns = [p.num_points() for p in primitives]
-        calls_rep = (rank * Ns[0] + rank * Ns[-1] +
-                     rank * rank * sum(Ns[1:-1])) if d > 2 else rank * sum(Ns)
+        calls_rep = (
+            (rank * Ns[0] + rank * Ns[-1] + rank * rank * sum(Ns[1:-1]))
+            if d > 2
+            else rank * sum(Ns)
+        )
     elif method == "TRC":
         score = _make_ttopt_score_transform(mode="min")
         obj = Objective(func, score)
