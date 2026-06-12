@@ -127,14 +127,15 @@ def multiwell(x, seed: int = 42) -> float:
 
     Motivated by pairwise interaction potentials in quantum chemistry
     where the total energy is a sum of two-body terms that couple
-    adjacent coordinates.  Each term factorises as a product of two 1-D
-    Lorentzians, giving the function TT rank <= m+1 = D.  Unlike a full D-body
-    product, a pairwise term provides clear signal in every 1-D cross-section
-    because only ONE adjacent coordinate needs to be near its well centre for
-    the signal to be detectable. This makes the function well-suited for
-    tensor cross methods (TRC, MTC, TTOpt) while remaining genuinely
-    challenging for population-based optimisers (D = 11 interacting degrees
-    of freedom with m = 10 distinct well configurations).
+    adjacent coordinates.  Each term factorises as a product of two 
+    one-dimensional Lorentzians, giving the function TT rank <= m+2 = D+2.
+
+    Unlike a full D-body product, a pairwise term provides clear signal in every
+    one-dimensional cross-section because only one adjacent coordinate
+    needs to be near its well centre for the signal to be detectable.
+    This makes the function well-suited for tensor cross methods (TRC, MTC, TTOpt)
+    while remaining genuinely challenging for population-based optimisers (D interacting
+    degrees of freedom with m = D distinct well configurations).
 
     Definition:
         phi(t) = 1 / (1 + t^2 / sigma^2),    sigma = 2.0
@@ -146,7 +147,7 @@ def multiwell(x, seed: int = 42) -> float:
 
     Domain: [-5, 5]^D
     Global minimum: 0.0  (at or near the centre of the highest-amplitude well)
-    TT rank: <= m = D
+    TT rank: <= m+2 = D+2
     """
     x = np.asarray(x, dtype=float)
     if x.ndim != 1:
