@@ -11,10 +11,10 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join("..", "..")))
 
-project = 'tq-mtopt'
-copyright = '2025, Roman Ellerbrock, Aleksandr Berezutskii'
-author = 'Roman Ellerbrock, Aleksandr Berezutskii'
-release = '0.1.0'
+project = "tq-mtopt"
+copyright = "2025, Roman Ellerbrock, Aleksandr Berezutskii"
+author = "Roman Ellerbrock, Aleksandr Berezutskii"
+release = "0.1.0"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -22,9 +22,9 @@ release = '0.1.0'
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
-    "sphinx.ext.napoleon",        # Google / NumPy style docstrings
-    "sphinx.ext.viewcode",        # Add [source] links
-    "sphinx_autodoc_typehints",   # From sphinx-autodoc-typehints
+    "sphinx.ext.napoleon",  # Google / NumPy style docstrings
+    "sphinx.ext.viewcode",  # Add [source] links
+    "sphinx_autodoc_typehints",  # From sphinx-autodoc-typehints
 ]
 
 # Automatically generate autosummary pages
@@ -46,13 +46,12 @@ napoleon_numpy_docstring = True
 napoleon_include_private_with_doc = False
 
 
-templates_path = ['_templates']
+templates_path = ["_templates"]
 exclude_patterns = []
-
 
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'sphinx_rtd_theme'
-html_static_path = ['_static']
+html_theme = "sphinx_rtd_theme"
+html_static_path = ["_static"]
