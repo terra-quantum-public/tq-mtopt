@@ -18,7 +18,7 @@ METHODS=(TRC TRC-z MTC TTOpt DE DA)
 # the paper suite F1..F11
 FUNCS=(Ackley Alpine1 Brown Exponential Griewank Michalewicz Qing Rastrigin Schaffer Schwefel Multiwell)
 
-BENCH_PY="examples/benchmarking/benchmark.py"
+BENCH_PY="examples/benchmarking/benchmark_optimization.py"
 
 # Output root
 OUT_ROOT="bench_qtt_L${L}_b${BASE}_D${DIMS}_r${RANK}_sweeps${SWEEPS}_exps${EXPS}_seed${SEED}_z${Z}"
