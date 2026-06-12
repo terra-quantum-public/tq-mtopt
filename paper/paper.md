@@ -26,7 +26,7 @@ bibliography: paper.bib
 
 # Summary
 
-**tq-mtopt** is a lightweight Python library that implements several optimizers on discrete grids by extending matrix cross approximation to several types of tensor networks. The first, **Tensor Rank Cross (TRC)** is a cross approximation for tensor rank decomposition (also called canonical diadic decomposition (Candecomp)). The second, **Matrix Train Cross (MTC)** approximation is a cross approximation that combines features of TRC and Tensor Train (TT, also called Matrix Product State (MPS)) decomposition. Finally, the package also includes a general Tree Tensor Network (TTN) optimizer that can be applied to any user-defined tree structure. The methods build low‑rank tensor representations of a function from a small number of function evaluations, then extract candidate optima directly from the representations. The package is designed specifically for high-dimensional functions with multiple local minima, where each function evaluation is computationally expensive.
+**tq-mtopt** is a lightweight Python library that implements several optimizers on discrete grids by extending matrix cross approximation to several types of tensor networks. The first, **Tensor Rank Cross (TRC)** is a cross approximation for tensor rank decomposition (also called canonical diadic decomposition (Candecomp)). The second, **Matrix Train Cross (MTC)** approximation is a cross approximation that combines features of TRC and Tensor Train (TT, also called Matrix Product State (MPS)) decomposition. Finally, the package also includes a general Tree Tensor Network (TTN) optimizer that can be applied to any user-defined tree structure. The methods build low‑rank tensor representations of a function from a small number of function evaluations, then extract candidate optima directly from the representations. Beyond optimization, the final skeleton can be promoted to an explicit function representation for fast repeated evaluation. Once built, evaluating the representation requires no further objective calls. Three formats are provided: a CP‑format representation (`TRCRepresentation`) built from any optimizer skeleton; a matrix-train representation (`MTRepresentation`) built from an MTC skeleton; and a pure TT-cross representation (`TTRepresentation`). The package is designed specifically for high-dimensional functions with multiple local minima, where each function evaluation is computationally expensive.
 
 
 # Statement of need
@@ -53,7 +53,15 @@ A new package was created rather than extending TTOpt because TRC and MTC requir
 
 * **Hyperparameters, budgets, and logging.** Topology, ranks, sweeps, 1D grid parameters (uniform or custom), and seeds are user-controlled. Function evaluations are cached and recorded, and the framework tracks objective-call counts. Computational and evaluation cost are bounded by the chosen rank, number of sweeps, and grid size. Deterministic seeding enables fair common-random-numbers comparisons across methods.
 
-* **Benchmarks & baselines.** The repo includes a benchmarking suite with CSV outputs and plots, comparing TRC and MTC against TTOpt and SciPy baselines (Differential Evolution and Dual Annealing). The benchmarks can conveniently be extended to other optimizers.
+* **Function representations.** Three formats convert an optimizer skeleton into an explicit approximation. Once built, evaluation requires no further objective calls and costs $O(r \cdot d)$ time per point for the CP format and $O(r^2 d)$ for the matrix-train and TT formats:
+
+    - `build_trc_representation` produces a CP (PARAFAC) approximation $f_{\rm approx}(x) = \sum_{p=1}^{r} w_p \prod_{k=1}^{d} F_k[\mathrm{idx}_k(x_k),\, p]$ from any TRC or MTC skeleton. Factor matrices $F_k$ and weight vector $w$ are fitted in one coordinate pass; the representation interpolates $f$ exactly at every skeleton point.
+
+    - `build_mt_representation` produces an `MTRepresentation` from an MTC skeleton in a single left-to-right pass, with no max-volume selection and no alternating sweeps: the skeleton fixes the left and right multi-index sets at every site, the fiber evaluations form the factor matrices $\{F_k\}$, and the per-bond cross sections are inverted by a truncated-SVD pseudo-inverse to give $\{A_k^{-1}\}$. The pass costs $r^2(d-2)N + 2rN$ objective evaluations on a uniform $N$-point grid.
+
+    - `build_tt_representation` produces a `TTRepresentation` via standard TT-cross sweeps with max-volume selection, requiring no optimizer skeleton. It serves as the baseline for representation quality comparisons.
+
+* **Benchmarks & baselines.** The repo includes a benchmarking suite with CSV outputs and plots, comparing TRC and MTC against TTOpt and SciPy baselines (Differential Evolution and Dual Annealing). A dedicated representation benchmark compares `MTRepresentation` against `TTRepresentation` across eleven standard test functions (F1–F11, plain grids, $d = 10$, $N = 20$, ranks $r \in \{1, 2, 4, 8\}$, 100 seeds). The benchmarks can conveniently be extended to other optimizers.
 
 
 # Software design
@@ -69,8 +77,8 @@ The tree topology in the TTN optimizer is represented as a NetworkX directed gra
 
 ```python
 import numpy as np
-from tq_mtopt.grid import Grid, tensor_network_grid, build_node_grid
-from tq_mtopt.network import balanced_tree, root
+from tq_mtopt.grid import Grid, tensor_network_grid
+from tq_mtopt.network import balanced_tree
 from tq_mtopt.optimization import (
     TensorRankOptimization,
     MatrixTrainOptimization,
@@ -125,17 +133,40 @@ print("TTN top-3 optima:")
 print(top_k.to_string())
 ```
 
+The final skeleton can be promoted to an explicit function representation (building it costs a bounded number of additional evaluations, evaluating it afterwards costs none):
+
+```python
+from tq_mtopt.representation import build_trc_representation, build_mt_representation
+
+# CP-format representation from the TRC skeleton
+rep_trc = build_trc_representation(skel_trc, primitives, sphere)
+
+# Matrix-train representation from the MTC skeleton
+# (single left-to-right pass; the skeleton fixes all pivots)
+rep_mt = build_mt_representation(skel_mtc, primitives, sphere)
+
+# Evaluate at arbitrary grid points — no further calls to sphere
+X_test = np.random.uniform(-2, 2, size=(1000, 3))
+approx_trc = rep_trc.evaluate_batch(X_test)
+approx_mt  = rep_mt.evaluate_batch(X_test)
+
+# TRC representation is exact at every skeleton point
+for pt in skel_trc.grid:
+    assert abs(rep_trc.evaluate(pt) - sphere(pt)) < 1e-10
+```
+
 Following the minimal example above, users can easily adapt the objective, discretization, rank schedule, and evaluation budget to their application. Additional usage examples as well as the detailed API documentation are provided in the
 [documentation](https://tq-mtopt.readthedocs.io/en/latest/).
 
 
 # Research impact statement
 
-**tq-mtopt** ships with a reproducible benchmarking suite covering eleven global optimization test functions and a randomly parameterized multi-well potential—in both plain-grid and quantized tensor train (QTT) grid configurations across a range of ranks, sweep counts, and problem dimensions. All results are saved as CSV files and publication-quality plots, experiments are fully reproducible through fixed seeds. Full API documentation is hosted on ReadTheDocs with end-to-end usage examples for all three optimizers. The repository includes GitHub Actions pipelines for continuous integration: unit tests, linting, code security scanning, dependency review, and automated package releases to ensure long-term correctness and ease of adoption. The deterministic seeding infrastructure enables future head-to-head comparisons against new architectures without rerunning existing baseline experiments.
+The matrix train is a new tensor-network format introduced with this package and its companion manuscript (in preparation). To our knowledge, it has never been used previously and **tq-mtopt** provides its first publicly available implementation. Beyond this novelty, the near-term significance of the package rests on three concrete things. First, reproducible benchmarkd: the repository ships a complete benchmarking suite covering twelve global-optimization test functions on both plain and quantized tensor train (QTT) grids, with deterministic common-random-number seeding shared across all five compared methods (TRC, MTC, TTN/TTOpt, Differential Evolution, Dual Annealing). All results are stored as CSV files together with publication-quality plots, so new optimizers can be benchmarked head-to-head against the recorded baselines without rerunning them; a companion representation benchmark compares the matrix-train and TT-cross formats under the same protocol ($d=10$, $N=20$, ranks $r \in \{1,2,4,8\}$, 100 seeds). Second, scientific findings already obtained with the package: the benchmarks show that that the matrix-train optimizer beats TTOpt on some functions, attaining lower mean error with several-fold fewer objective evaluations e.g., on the Schaffer function, $6.1\times10^{-2}$ in ${\sim}61$k calls versus $6.8\times10^{-2}$ in ${\sim}240$k, and on the Brown function, $1.0\times10^{-2}$ in ${\sim}21$k calls versus $4.0\times10^{-2}$ in ${\sim}233$k; and that the multiwell potential can be optimized by iterative skeleton refinement even when its fixed-rank representation error remains $O(1)$, demonstrating that global surrogate accuracy is not a prerequisite for sample-efficient optimization. These experiments form the numerical basis of a companion methods manuscript in preparation. Third, community-readiness signals: the package is developed openly at `terra-quantum-public/mtopt` with unit tests for all core modules, continuous integration covering tests, linting, CodeQL security scanning, and dependency review, automated package releases, and full API documentation with end-to-end examples for all three optimizers hosted on ReadTheDocs.
 
 
 # AI usage disclosure
-Generative AI tools were used to assist with paper writing and documentation. The software implementation, algorithmic design, benchmarking, and core technical contributions were developed without AI assistance. All AI-assisted content has been reviewed and validated by the authors for technical accuracy and scholarly integrity.
+
+Generative AI tools were used to assist with paper writing, documentation, software implementation, algorithmic design and benchmarking. All AI-assisted content has been reviewed and validated by the authors for technical accuracy and scholarly integrity.
 
 
 # References
