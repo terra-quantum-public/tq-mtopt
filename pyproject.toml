@@ -22,7 +22,7 @@ requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^9.0.3"
+pytest = "^9.1.0"
 ruff = "^0.15.16"
 pylint = "^4.0.5"
 plotly-stubs = "0.1.3"
