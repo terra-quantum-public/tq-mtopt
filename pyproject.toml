@@ -30,7 +30,7 @@ matplotlib-stubs = "0.3.11"
 
 [tool.poetry.group.benchmarking.dependencies]
 matplotlib = "^3.10.9"
-tqdm = "^4.68.2"
+tqdm = "^4.68.3"
 
 
 [tool.poetry.group.docs.dependencies]
